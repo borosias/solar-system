@@ -14,6 +14,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState } from 'react';
 import {TSection} from "../types/TSection.ts";
 import SolarSystem from "./Model.tsx";
+import FullScreenButton from "./FullScreenButton.tsx";
 
 const theme = createTheme({
     palette: {
@@ -54,6 +55,9 @@ const ModelBox = styled('div')({
     height: '75vh',
     backgroundColor: '#000000',
     color: '#fff' });
+const handleFullScreenToggle = () => {
+    console.log('Toggle full screen');
+};
 
 function App() {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -80,10 +84,15 @@ function App() {
                     )}
                 </Toolbar>
             </AppBar>
-            <Container sx={{ mt: 4 }}>
-                <ModelBox>
+            <Container sx={{ mt: 4 ,
+                display: "flex",
+                flexDirection:"column",
+                alignItems:"flex-end"
+            }}>
+                <ModelBox id="model-container" sx={{width:'100%'}}>
                     <SolarSystem/>
                 </ModelBox>
+                <FullScreenButton  onFullScreenToggle={handleFullScreenToggle} />
             </Container>
             <Box component="footer" sx={{ mt: 4, p: 2, textAlign: 'center', backgroundColor: '#222222', color: '#fff' }}>
                 <Typography variant="body2" color="inherit">

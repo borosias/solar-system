@@ -1,25 +1,18 @@
 import { Canvas, useFrame } from '@react-three/fiber';
-import {Line, OrbitControls, Stars} from '@react-three/drei';
+import {OrbitControls, Stars} from '@react-three/drei';
 import * as THREE from 'three';
 import React, { useRef, useState, useMemo } from 'react';
+import {PlanetProps} from "../types/TPlanet.ts";
 
-type PlanetProps = {
-    position: [number, number, number];
-    color: string;
-    size: number;
-    orbitRadius?: number;
-    orbitSpeed?: number;
-    emissive?: boolean;
-};
-
-const Planet: React.FC<PlanetProps> = ({
-                                           position,
-                                           color,
-                                           size,
-                                           orbitRadius = 0,
-                                           orbitSpeed = 0,
-                                           emissive = false,
-                                       }) => {
+const Planet: React.FC<PlanetProps> = (
+    {
+        position,
+        color,
+        size,
+        orbitRadius = 0,
+        orbitSpeed = 0,
+        emissive = false,
+    }) => {
     const mesh = useRef<THREE.Mesh>(null!);
     const [orbitPosition, setOrbitPosition] = useState(position);
 
@@ -41,20 +34,29 @@ const Planet: React.FC<PlanetProps> = ({
             orbitRadius, orbitRadius, // xRadius, yRadius
             0, 2 * Math.PI, // aStartAngle, aEndAngle
             false, // aClockwise
-            0 // aRotation
+            Math.PI / 2 // aRotation
         );
-        const points = curve.getPoints(50);
+        const points = curve.getPoints(500);
         const orbit = new THREE.BufferGeometry().setFromPoints(points);
+        orbit.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
         return orbit;
     }, [orbitRadius]);
 
     return (
         <>
-            <line geometry={orbitGeometry}>
-                <lineBasicMaterial attach="material" color="white" linewidth={1} />
+            <line>
+                <bufferGeometry attach="geometry">
+                    <bufferAttribute
+                        attach="attributes-position"
+                        count={orbitGeometry.attributes.position.array.length / 3}
+                        array={orbitGeometry.attributes.position.array}
+                        itemSize={3}
+                    />
+                </bufferGeometry>
+                <lineBasicMaterial attach="material" color="white" linewidth={1}/>
             </line>
             <mesh ref={mesh} position={orbitPosition}>
-                <sphereGeometry args={[size, 32, 32]} />
+                <sphereGeometry args={[size, 32, 32]}/>
                 <meshStandardMaterial
                     color={color}
                     emissive={emissive ? color : 'black'}
