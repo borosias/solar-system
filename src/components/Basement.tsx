@@ -10,8 +10,8 @@ import {
     useMediaQuery,
     styled
 } from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useState } from 'react';
+import {createTheme, ThemeProvider} from '@mui/material/styles';
+import {useState} from 'react';
 import {TSection} from "../types/TSection.ts";
 import SolarSystem from "./Model.tsx";
 import FullScreenButton from "./FullScreenButton.tsx";
@@ -43,10 +43,11 @@ const theme = createTheme({
 });
 
 const sections: TSection[] = [
-    { title: 'Home', href: '#home' },
-    { title: 'About', href: '#about' },
-    { title: 'Contact', href: '#contact' },
+    {title: 'Home', href: '#home'},
+    {title: 'About', href: '#about'},
+    {title: 'Contact', href: '#contact'},
 ];
+
 
 const ModelBox = styled('div')({
     display: 'flex',
@@ -54,7 +55,8 @@ const ModelBox = styled('div')({
     alignItems: 'center',
     height: '75vh',
     backgroundColor: '#000000',
-    color: '#fff' });
+    color: '#fff'
+});
 const handleFullScreenToggle = () => {
     console.log('Toggle full screen');
 };
@@ -65,13 +67,13 @@ function App() {
 
     return (
         <ThemeProvider theme={theme}>
-            <CssBaseline />
+            <CssBaseline/>
             <AppBar position="static">
                 <Toolbar>
-                    <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" sx={{flexGrow: 1}}>
                         Solaris
                     </Typography>
-                    {(!isMobile || isMenuOpen) && sections.map((section:TSection) => (
+                    {(!isMobile || isMenuOpen) && sections.map((section: TSection) => (
                         <Button key={section.title} color="inherit" href={section.href}>
                             {section.title}
                         </Button>
@@ -84,17 +86,18 @@ function App() {
                     )}
                 </Toolbar>
             </AppBar>
-            <Container sx={{ mt: 4 ,
+            <Container sx={{
+                mt: 4,
                 display: "flex",
-                flexDirection:"column",
-                alignItems:"flex-end"
+                flexDirection: "column",
+                alignItems: "flex-end"
             }}>
-                <ModelBox id="model-container" sx={{width:'100%'}}>
+                <ModelBox id="model-container" sx={{width: '100%'}}>
                     <SolarSystem/>
                 </ModelBox>
-                <FullScreenButton  onFullScreenToggle={handleFullScreenToggle} />
+                <FullScreenButton onFullScreenToggle={handleFullScreenToggle}/>
             </Container>
-            <Box component="footer" sx={{ mt: 4, p: 2, textAlign: 'center', backgroundColor: '#222222', color: '#fff' }}>
+            <Box component="footer" sx={{mt: 4, p: 2, textAlign: 'center', backgroundColor: '#222222', color: '#fff'}}>
                 <Typography variant="body2" color="inherit">
                     &copy; 2024 My Stylish Website
                 </Typography>

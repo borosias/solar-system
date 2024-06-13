@@ -1,108 +1,151 @@
-import { Canvas, useFrame } from '@react-three/fiber';
+import {Canvas, extend, useFrame, useThree} from '@react-three/fiber';
 import {OrbitControls, Stars} from '@react-three/drei';
-import * as THREE from 'three';
-import React, { useRef, useState, useMemo } from 'react';
-import {PlanetProps} from "../types/TPlanet.ts";
+import React, {useEffect, useState} from 'react';
+import SpaceObject from './SpaceObject.tsx'; // Импортируйте компонент Planet
+import {ObjectProps, Planet} from "../types/TPlanet.ts";
+import {getPlanetData} from "../api/planetInfo.ts";
+import PlanetInfoBox from "./PlanetInfoDialog.tsx";
 
-const Planet: React.FC<PlanetProps> = (
-    {
-        position,
-        color,
-        size,
-        orbitRadius = 0,
-        orbitSpeed = 0,
-        emissive = false,
-    }) => {
-    const mesh = useRef<THREE.Mesh>(null!);
-    const [orbitPosition, setOrbitPosition] = useState(position);
+import sunTexture from '../textures/sun.jpg';
+import mercuryTexture from '../textures/mercury.jpg';
+import venusTexture from '../textures/venus.jpg';
+import earthTexture from '../textures/earth.jpg';
+import marsTexure from '../textures/mars.jpg';
+import jupiterTexture from '../textures/jupiter.jpg';
+import saturnTexture from '../textures/saturn.jpg';
+import uranusTexture from '../textures/uranus.jpg';
+import neptuneTexture from '../textures/neptune.jpg';
+
+
+extend({OrbitControls});
+
+const CameraController: React.FC<{ selectedPlanet: ObjectProps | null }> = ({selectedPlanet}) => {
+    const {camera, gl} = useThree();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const controls = React.useRef<any>();
 
     useFrame(() => {
-        if (mesh.current) {
-            mesh.current.rotation.y += 0.01; // Вращение вокруг своей оси
-            const angle = (Date.now() * orbitSpeed) % (2 * Math.PI); // Угол вращения вокруг солнца
-            const x = orbitRadius * Math.cos(angle);
-            const y = position[1]; // Удерживаем высоту планеты постоянной
-            const z = orbitRadius * Math.sin(angle);
-            setOrbitPosition([x, y, z]); // Обновление позиции планеты на орбите
+        if (controls.current) {
+            controls.current.update();
         }
     });
 
-    // Создаем геометрию орбиты
-    const orbitGeometry = useMemo(() => {
-        const curve = new THREE.EllipseCurve(
-            0, 0, // ax, aY
-            orbitRadius, orbitRadius, // xRadius, yRadius
-            0, 2 * Math.PI, // aStartAngle, aEndAngle
-            false, // aClockwise
-            Math.PI / 2 // aRotation
-        );
-        const points = curve.getPoints(500);
-        const orbit = new THREE.BufferGeometry().setFromPoints(points);
-        orbit.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
-        return orbit;
-    }, [orbitRadius]);
+    useEffect(() => {
+        if (selectedPlanet) {
+            // Центрируем камеру вокруг выбранной планеты
+            controls.current.target.set(...selectedPlanet.position);
+        }
+    }, [selectedPlanet]);
 
     return (
-        <>
-            <line>
-                <bufferGeometry attach="geometry">
-                    <bufferAttribute
-                        attach="attributes-position"
-                        count={orbitGeometry.attributes.position.array.length / 3}
-                        array={orbitGeometry.attributes.position.array}
-                        itemSize={3}
-                    />
-                </bufferGeometry>
-                <lineBasicMaterial attach="material" color="white" linewidth={1}/>
-            </line>
-            <mesh ref={mesh} position={orbitPosition}>
-                <sphereGeometry args={[size, 32, 32]}/>
-                <meshStandardMaterial
-                    color={color}
-                    emissive={emissive ? color : 'black'}
-                    emissiveIntensity={emissive ? 1 : 0}
-                />
-            </mesh>
-        </>
+        <OrbitControls
+            ref={controls}
+            args={[camera, gl.domElement]}
+            enableDamping
+            dampingFactor={0.1}
+            rotateSpeed={0.5}
+            maxDistance={100}
+            minDistance={1}
+        />
     );
 };
 
+//===============================================================================
+
 const SolarSystem: React.FC = () => {
+    const [selectedPlanet, setSelectedPlanet] = useState<ObjectProps | null>(null);
+    const names: string[] = ["Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
+    const [spaceObjectsData, setSpaceObjectsData] = useState<Planet[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        const fetchSpaceObjectsData = async () => {
+            const dataPromises = names.map(name => getPlanetData(name));
+            const data = await Promise.all(dataPromises);
+            setSpaceObjectsData(data.filter(item => item !== null) as Planet[]);
+            setLoading(false); // Устанавливаем загрузку в false после получения данных
+        };
+
+        fetchSpaceObjectsData();
+    }, []);
+
+    const handlePlanetClick = (planetInfo: ObjectProps) => {
+        setSelectedPlanet(planetInfo);
+    };
+    const handleCloseInfoBox = () => {
+        setSelectedPlanet(null);
+    };
+
+    const planetInfo = selectedPlanet ? spaceObjectsData.find(object => object.englishName.toLowerCase() === selectedPlanet.pName.toLowerCase()) : null;
+
+    if (loading) {
+
+        return (
+            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
+                <div>Loading...</div>
+            </div>
+        );
+    }
+
     return (
-        <Canvas camera={{ position: [0, 0, 100], fov: 60 }}>
-            <ambientLight intensity={0.1} />
-            <pointLight position={[0, 0, 0]} intensity={20} decay={1} distance={300} castShadow={true} />
-            <Stars />
+        <>
+            <Canvas camera={{position: [0, 0, 100], fov: 60, far: 10000}}>
+                <ambientLight intensity={0.1}/>
+                <pointLight position={[0, 0, 0]} intensity={20} decay={1} distance={300} castShadow={true}/>
+                <Stars count={12000} radius={400} depth={500} factor={10}/>
 
-            {/* Sun */}
-            <Planet position={[0, 0, 0]} color="yellow" size={5} emissive={true} />
+                {/* Sun */}
+                <SpaceObject
+                    pName={names[0]}
+                    position={[0, 0, 0]}
+                    size={5}
+                    color="orange"
+                    emissive={true}
+                    orbitRadius={0}
+                    orbitSpeed={0}
+                    onClick={handlePlanetClick}
+                    textureUrl={sunTexture}
+                />
 
-            {/* Mercury */}
-            <Planet position={[0, 0, 0]} color="gray" size={0.4} orbitRadius={10} orbitSpeed={0.000008} />
+                {/* Mercury */}
+                <SpaceObject pName={names[1]} position={[0, 0, 0]} size={0.4} orbitRadius={10}
+                             orbitSpeed={0.000008} emissive={false} onClick={handlePlanetClick} textureUrl={mercuryTexture} />
 
-            {/* Venus */}
-            <Planet position={[0, 0, 0]} color="orange" size={1} orbitRadius={15} orbitSpeed={0.000015} />
+                {/* Venus */}
+                <SpaceObject pName={names[2]} position={[0, 0, 0]} size={1} orbitRadius={15}
+                             orbitSpeed={0.000015} emissive={false} onClick={handlePlanetClick} textureUrl={venusTexture}/>
 
-            {/* Earth */}
-            <Planet position={[0, 0, 0]} color="blue" size={1} orbitRadius={20} orbitSpeed={0.00002} />
+                {/* Earth */}
+                <SpaceObject pName={names[3]} position={[0, 0, 0]} size={1} orbitRadius={20}
+                             orbitSpeed={0.00002} emissive={false} onClick={handlePlanetClick} textureUrl={earthTexture}/>
 
-            {/* Mars */}
-            <Planet position={[0, 0, 0]} color="red" size={0.5} orbitRadius={25} orbitSpeed={0.000025} />
+                {/* Mars */}
+                <SpaceObject pName={names[4]} position={[0, 0, 0]} size={0.5} orbitRadius={25}
+                             orbitSpeed={0.000015} emissive={false} onClick={handlePlanetClick} textureUrl={marsTexure}/>
 
-            {/* Jupiter */}
-            <Planet position={[0, 0, 0]} color="orange" size={1.5} orbitRadius={35} orbitSpeed={0.000005} />
+                {/* Jupiter */}
+                <SpaceObject pName={names[5]} position={[0, 0, 0]} size={1.5} orbitRadius={35}
+                             orbitSpeed={0.000005} emissive={false} onClick={handlePlanetClick} textureUrl={jupiterTexture}/>
 
-            {/* Saturn */}
-            <Planet position={[0, 0, 0]} color="yellow" size={1.2} orbitRadius={45} orbitSpeed={0.000003} />
+                {/* Saturn */}
+                <SpaceObject pName={names[6]} position={[0, 0, 0]} size={1.2} orbitRadius={45}
+                             orbitSpeed={0.000003} emissive={false} onClick={handlePlanetClick} textureUrl={saturnTexture}/>
 
-            {/* Uranus */}
-            <Planet position={[0, 0, 0]} color="lightblue" size={1} orbitRadius={55} orbitSpeed={0.000002} />
+                {/* Uranus */}
+                <SpaceObject pName={names[7]} position={[0, 0, 0]} size={1} orbitRadius={55}
+                             orbitSpeed={0.000002} emissive={false} onClick={handlePlanetClick} textureUrl={uranusTexture}/>
 
-            {/* Neptune */}
-            <Planet position={[0, 0, 0]} color="blue" size={1} orbitRadius={65} orbitSpeed={0.0000015} />
+                {/* Neptune */}
+                <SpaceObject pName={names[8]} position={[0, 0, 0]} size={1} orbitRadius={65}
+                             orbitSpeed={0.0000015} emissive={false} onClick={handlePlanetClick} textureUrl={neptuneTexture}/>
 
-            <OrbitControls />
-        </Canvas>
+                <CameraController selectedPlanet={selectedPlanet}/>
+            </Canvas>
+
+            {selectedPlanet && planetInfo && (
+                <PlanetInfoBox planetInfo={planetInfo} onClose={handleCloseInfoBox}/>
+            )}
+        </>
     );
 };
 

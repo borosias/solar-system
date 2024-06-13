@@ -14,9 +14,14 @@
     "@emotion/styled": "^11.11.5",
     "@mui/material": "^5.15.19",
     "file-loader": "^6.2.0",
+    "i18next": "^23.11.5",
+    "i18next-browser-languagedetector": "^8.0.0",
+    "i18next-xhr-backend": "^3.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "three": "^0.164.1"
+    "react-i18next": "^14.1.2",
+    "three": "^0.164.1",
+    "translate": "^3.0.0"
   },
   "devDependencies": {
     "@mui/icons-material": "^5.15.19",
@@ -32,6 +37,9 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "i18next-http-backend": "^2.5.2",
+    "react-loader-spinner": "^6.1.6",
+    "react-popper": "^2.3.0",
     "typescript": "^5.4.5",
     "vite": "^5.2.0"
   }
