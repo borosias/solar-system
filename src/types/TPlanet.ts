@@ -30,6 +30,8 @@ export interface Planet {
     density: number;
     moons?: Moon[];
     isPlanet: boolean;
+    semimajorAxis: number;
+    sideralOrbit: number;
 }
 
 export interface ApiResponse {

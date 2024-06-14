@@ -1,8 +1,7 @@
-import { useFrame } from '@react-three/fiber';
-import { useLoader } from '@react-three/fiber';
+import {useFrame, useLoader} from '@react-three/fiber';
 import * as THREE from 'three';
-import React, { useRef, useState, useMemo } from 'react';
-import { ObjectProps } from "../types/TPlanet.ts";
+import React, {useRef, useState, useMemo} from 'react';
+import {ObjectProps} from "../types/TPlanet.ts";
 
 interface ClickablePlanetProps extends ObjectProps {
     onClick?: (planetInfo: ObjectProps) => void;
@@ -62,7 +61,7 @@ const SpaceObject: React.FC<ClickablePlanetProps> = ({
                         itemSize={3}
                     />
                 </bufferGeometry>
-                <lineBasicMaterial attach="material" color="white" linewidth={0.1} transparent opacity={0.3} />
+                <lineBasicMaterial attach="material" color="white" linewidth={0.1} transparent opacity={0.3}/>
             </line>
             <mesh
                 ref={mesh}
@@ -77,13 +76,26 @@ const SpaceObject: React.FC<ClickablePlanetProps> = ({
                     pName
                 })}
             >
-                <sphereGeometry args={[size, 32, 32]} />
-                <meshStandardMaterial
-                    map={planetTexture}
-                    color={color}
-                    emissive={emissive ? color : 'black'}
-                    emissiveIntensity={emissive ? 1 : 0}
-                />
+                <sphereGeometry args={[size, 32, 32]}/>
+                {pName === "Sun" ?
+                    <>
+                        <meshPhysicalMaterial
+                            lightMap={planetTexture}
+                            map={planetTexture}
+                            lightMapIntensity={5}
+                            emissive={emissive ? 'white' : 'black'}
+                            emissiveIntensity={emissive ? 0.01 : 0}
+                        />
+                        <pointLight color="yellow" distance={0} intensity={1.5} decay={2} />
+                    </>
+                    :
+                    <meshPhysicalMaterial
+                        map={planetTexture}
+                        color={color}
+                        emissive={emissive ? 'white' : 'black'}
+                        emissiveIntensity={emissive ? 0.01 : 0}
+                    />
+                }
             </mesh>
         </>
     );
