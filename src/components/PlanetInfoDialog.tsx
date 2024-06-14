@@ -29,13 +29,13 @@ const PlanetInfoBox: React.FC<PlanetInfoBoxProps> = ({ planetInfo, onClose }) =>
             >
                 <CloseIcon />
             </IconButton>
-            <Typography variant="h6">Інформація про об'єкт</Typography>
-            <Typography style={{marginTop:'1vw'}}>Назва: {planetInfo.englishName}</Typography>
-            <Typography>Діаметр: {`${planetInfo.meanRadius * 2} km`}</Typography>
-            <Typography>Маса: {`${planetInfo.mass.massValue} * 10^${planetInfo.mass.massExponent} kg`}</Typography>
-            <Typography>Гравітація: {`${planetInfo.gravity} m/s²`}</Typography>
-            <Typography>Густота: {`${planetInfo.density} g/cm³`}</Typography>
-            <Typography>Супутники: {`${planetInfo.moons ? planetInfo.moons.length : 0}`}</Typography>
+            <Typography variant="h6">Information</Typography>
+            <Typography style={{marginTop:'1vw'}}>Name: {planetInfo.englishName}</Typography>
+            <Typography>Diameter: {`${planetInfo.meanRadius * 2} km`}</Typography>
+            <Typography>Mass: {`${planetInfo.mass.massValue} * 10^${planetInfo.mass.massExponent} kg`}</Typography>
+            <Typography>Gravity: {`${planetInfo.gravity} m/s²`}</Typography>
+            <Typography>Density: {`${planetInfo.density} g/cm³`}</Typography>
+            <Typography>Moons: {`${planetInfo.moons ? planetInfo.moons.length : 0}`}</Typography>
         </Paper>
     );
 };

@@ -11,10 +11,10 @@ import {BrowserRouter as Router, Route, Link, Routes} from 'react-router-dom';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import {useState} from 'react';
 import {TSection} from "../types/TSection.ts";
-import MainPage from "./MainPage.tsx";
 import ModelOpenPage from "./ModelOpenPage.tsx";
 import HomePage from "./MainPage.tsx";
 import PrivacyPolicy from "./Privacy Policy.tsx";
+import CatalogPage from "./PageWithInfo.tsx";
 
 const theme = createTheme({
     palette: {
@@ -74,7 +74,7 @@ function App() {
                     </Toolbar>
                 </AppBar>
                 <Routes>
-                    <Route path="/catalog" element={<MainPage/>}/>
+                    <Route path="/catalog" element={<CatalogPage/>}/>
                     <Route path="/model" element={<ModelOpenPage/>}/>
                     <Route path="/" element={<HomePage />}/>
                     <Route path="/privacy_policy_solaris" element={<PrivacyPolicy />}/>
