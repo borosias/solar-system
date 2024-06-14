@@ -3,18 +3,18 @@ import {
     Toolbar,
     Typography,
     Box,
-    Container,
-    Link,
     CssBaseline,
     Button,
     useMediaQuery,
-    styled
 } from '@mui/material';
+import {BrowserRouter as Router, Route, Link, Routes} from 'react-router-dom';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import {useState} from 'react';
 import {TSection} from "../types/TSection.ts";
-import SolarSystem from "./Model.tsx";
-import FullScreenButton from "./FullScreenButton.tsx";
+import MainPage from "./MainPage.tsx";
+import ModelOpenPage from "./ModelOpenPage.tsx";
+import HomePage from "./MainPage.tsx";
+import PrivacyPolicy from "./Privacy Policy.tsx";
 
 const theme = createTheme({
     palette: {
@@ -43,23 +43,10 @@ const theme = createTheme({
 });
 
 const sections: TSection[] = [
-    {title: 'Home', href: '#home'},
-    {title: 'About', href: '#about'},
-    {title: 'Contact', href: '#contact'},
+    {title: 'Home', href: '/'},
+    {title: 'Model', href: '/model'},
+    {title: 'Catalog', href: '/catalog'},
 ];
-
-
-const ModelBox = styled('div')({
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '75vh',
-    backgroundColor: '#000000',
-    color: '#fff'
-});
-const handleFullScreenToggle = () => {
-    console.log('Toggle full screen');
-};
 
 function App() {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -67,44 +54,40 @@ function App() {
 
     return (
         <ThemeProvider theme={theme}>
-            <CssBaseline/>
-            <AppBar position="static">
-                <Toolbar>
-                    <Typography variant="h6" sx={{flexGrow: 1}}>
-                        Solaris
+            <Router>
+            <CssBaseline />
+                <AppBar position="static">
+                    <Toolbar>
+                        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                            Solaris
+                        </Typography>
+                        {(!isMobile || isMenuOpen) && sections.map((section: TSection) => (
+                            <Link key={section.title} to={section.href} style={{ textDecoration: 'none' , color:"inherit"}}>
+                                <Button color="inherit">{section.title}</Button>
+                            </Link>
+                        ))}
+                        {isMobile && (
+                            <Button color="inherit" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                                {isMenuOpen ? 'Close' : 'Menu'}
+                            </Button>
+                        )}
+                    </Toolbar>
+                </AppBar>
+                <Routes>
+                    <Route path="/catalog" element={<MainPage/>}/>
+                    <Route path="/model" element={<ModelOpenPage/>}/>
+                    <Route path="/" element={<HomePage />}/>
+                    <Route path="/privacy_policy_solaris" element={<PrivacyPolicy />}/>
+                </Routes>
+                <Box component="footer" sx={{ mt: 4, p: 2, textAlign: 'center', backgroundColor: '#222222', color: '#fff' }}>
+                    <Typography variant="body2" color="inherit">
+                        &copy; 2024 Solaris Website
                     </Typography>
-                    {(!isMobile || isMenuOpen) && sections.map((section: TSection) => (
-                        <Button key={section.title} color="inherit" href={section.href}>
-                            {section.title}
-                        </Button>
-                    ))}
-                    {!isMobile && <Button color="inherit">Login</Button>}
-                    {isMobile && (
-                        <Button color="inherit" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                            {isMenuOpen ? 'Close' : 'Menu'}
-                        </Button>
-                    )}
-                </Toolbar>
-            </AppBar>
-            <Container sx={{
-                mt: 4,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-end"
-            }}>
-                <ModelBox id="model-container" sx={{width: '100%'}}>
-                    <SolarSystem/>
-                </ModelBox>
-                <FullScreenButton onFullScreenToggle={handleFullScreenToggle}/>
-            </Container>
-            <Box component="footer" sx={{mt: 4, p: 2, textAlign: 'center', backgroundColor: '#222222', color: '#fff'}}>
-                <Typography variant="body2" color="inherit">
-                    &copy; 2024 My Stylish Website
-                </Typography>
-                <Typography variant="body2" color="inherit">
-                    <Link href="#" color="inherit" underline="always">Privacy Policy</Link>
-                </Typography>
-            </Box>
+                    <Typography variant="body2" color="inherit">
+                        <Link color="inherit" to={'/privacy_policy_solaris'}>Privacy Policy</Link>
+                    </Typography>
+                </Box>
+            </Router>
         </ThemeProvider>
     );
 }

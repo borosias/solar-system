@@ -1,9 +1,9 @@
-import {Canvas, extend, useFrame, useThree} from '@react-three/fiber';
-import {OrbitControls, Stars} from '@react-three/drei';
-import React, {useEffect, useState} from 'react';
+import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
+import { OrbitControls, Stars } from '@react-three/drei';
+import React, { useEffect, useState } from 'react';
 import SpaceObject from './SpaceObject.tsx';
-import {ObjectProps, Planet} from "../types/TPlanet.ts";
-import {getPlanetData} from "../api/planetInfo.ts";
+import { ObjectProps, Planet } from "../types/TPlanet.ts";
+import { getPlanetData } from "../api/planetInfo.ts";
 import PlanetInfoBox from "./PlanetInfoDialog.tsx";
 
 import sunTexture from '../textures/sun.jpg';
@@ -16,11 +16,10 @@ import saturnTexture from '../textures/saturn.jpg';
 import uranusTexture from '../textures/uranus.jpg';
 import neptuneTexture from '../textures/neptune.jpg';
 
+extend({ OrbitControls });
 
-extend({OrbitControls});
-
-const CameraController: React.FC<{ selectedPlanet: ObjectProps | null }> = ({selectedPlanet}) => {
-    const {camera, gl} = useThree();
+const CameraController: React.FC<{ selectedPlanet: ObjectProps | null }> = ({ selectedPlanet }) => {
+    const { camera, gl } = useThree();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const controls = React.useRef<any>();
 
@@ -53,6 +52,7 @@ const CameraController: React.FC<{ selectedPlanet: ObjectProps | null }> = ({sel
 
 const SolarSystem: React.FC = () => {
     const [selectedPlanet, setSelectedPlanet] = useState<ObjectProps | null>(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const names: string[] = ["Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
     const textures = [sunTexture, mercuryTexture, venusTexture, earthTexture, marsTexure, jupiterTexture, saturnTexture, uranusTexture, neptuneTexture]
     const [spaceObjectsData, setSpaceObjectsData] = useState<Planet[]>([]);
@@ -60,14 +60,43 @@ const SolarSystem: React.FC = () => {
 
     useEffect(() => {
         const fetchSpaceObjectsData = async () => {
-            const dataPromises = names.map(name => getPlanetData(name));
-            const data = await Promise.all(dataPromises);
-            setSpaceObjectsData(data.filter(item => item !== null) as Planet[]);
-            setLoading(false);
+            const cachedData = localStorage.getItem('spaceObjectsData');
+            if (cachedData) {
+                try {
+                    const parsedData = JSON.parse(cachedData);
+                    setSpaceObjectsData(parsedData);
+                    setLoading(false);
+                } catch (error) {
+                    console.error('Error parsing data from localStorage:', error);
+                    localStorage.removeItem('spaceObjectsData'); // Удаляем кеш, если не удалось его прочитать
+                }
+            } else {
+                let retries = 3; // Количество попыток повторной загрузки
+                const fetchData = async () => {
+                    try {
+                        const dataPromises = names.map(name => getPlanetData(name));
+                        const data = await Promise.all(dataPromises);
+                        const filteredData = data.filter(item => item !== null) as Planet[];
+                        setSpaceObjectsData(filteredData);
+                        localStorage.setItem('spaceObjectsData', JSON.stringify(filteredData));
+                        setLoading(false);
+                    } catch (error) {
+                        console.error('Error fetching data from API:', error);
+                        retries--;
+                        if (retries > 0) {
+                            setTimeout(fetchData, 1000 * (3 - retries)); // Экспоненциальная задержка повторных попыток
+                        } else {
+                            localStorage.removeItem('spaceObjectsData'); // Удаляем кеш, если не удалось загрузить данные
+                            // Возможно, отобразить сообщение об ошибке пользователю
+                        }
+                    }
+                };
+                fetchData();
+            }
         };
 
         fetchSpaceObjectsData();
-    }, []);
+    }, [names]);
 
     const getOrbit = (name: string) => {
         const planetData = spaceObjectsData.find(object => object.englishName.toLowerCase() === name.toLowerCase());
@@ -87,6 +116,7 @@ const SolarSystem: React.FC = () => {
     const handlePlanetClick = (planetInfo: ObjectProps) => {
         setSelectedPlanet(planetInfo);
     };
+
     const handleCloseInfoBox = () => {
         setSelectedPlanet(null);
     };
@@ -94,9 +124,8 @@ const SolarSystem: React.FC = () => {
     const planetInfo = selectedPlanet ? spaceObjectsData.find(object => object.englishName.toLowerCase() === selectedPlanet.pName.toLowerCase()) : null;
 
     if (loading) {
-
         return (
-            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                 <div>Loading...</div>
             </div>
         );
@@ -104,12 +133,10 @@ const SolarSystem: React.FC = () => {
 
     return (
         <>
-            <Canvas camera={{position: [0, 0, 100], fov: 60, far: 35000}}>
-                <ambientLight intensity={0.1}/>
-                <pointLight position={[0, 0, 0]} intensity={500} decay={1} distance={15000} castShadow={true}/>
-                <Stars count={15000} radius={10000} depth={1000} factor={40}/>
-                //TODO: Maybe better realize ABSOLUTELY REAL data params but add some buttons to manage and control cam
-                position
+            <Canvas camera={{ position: [0, 0, 300], fov: 60, far: 35000 }}>
+                <ambientLight intensity={0.1} />
+                <pointLight position={[0, 0, 0]} intensity={500} decay={1} distance={15000} castShadow={true} />
+                <Stars count={15000} radius={10000} depth={1000} factor={40} />
                 <SpaceObject
                     pName={names[0]}
                     position={[0, 0, 0]}
@@ -128,18 +155,18 @@ const SolarSystem: React.FC = () => {
                             position={[0, 0, 0]}
                             size={getSize(name) * (name === "Sun" ? 0.0000002 : 0.0002)}
                             orbitRadius={getOrbit(name) * 0.000002}
-                            orbitSpeed={1 / getSpeed(name) * 0.0005}
+                            orbitSpeed={1 / getSpeed(name) * 0.0001}
                             emissive={name === "Sun"}
                             onClick={handlePlanetClick}
                             textureUrl={textures[index]}
                         />
                     ))
                 }
-                <CameraController selectedPlanet={selectedPlanet}/>
+                <CameraController selectedPlanet={selectedPlanet} />
             </Canvas>
 
             {selectedPlanet && planetInfo && (
-                <PlanetInfoBox planetInfo={planetInfo} onClose={handleCloseInfoBox}/>
+                <PlanetInfoBox planetInfo={planetInfo} onClose={handleCloseInfoBox} />
             )}
         </>
     );

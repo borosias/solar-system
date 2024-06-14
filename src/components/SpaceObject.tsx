@@ -76,7 +76,7 @@ const SpaceObject: React.FC<ClickablePlanetProps> = ({
                     pName
                 })}
             >
-                <sphereGeometry args={[size, 32, 32]}/>
+                <sphereGeometry args={[size, 64, 64]}/>
                 {pName === "Sun" ?
                     <>
                         <meshPhysicalMaterial
