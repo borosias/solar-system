@@ -54,7 +54,7 @@ const CameraController: React.FC<{ selectedPlanet: ObjectProps | null }> = ({sel
 const SolarSystem: React.FC = () => {
     const [selectedPlanet, setSelectedPlanet] = useState<ObjectProps | null>(null);
     const names: string[] = ["Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
-    const textures = [sunTexture, mercuryTexture, venusTexture, earthTexture,marsTexure, jupiterTexture, saturnTexture, uranusTexture, neptuneTexture]
+    const textures = [sunTexture, mercuryTexture, venusTexture, earthTexture, marsTexure, jupiterTexture, saturnTexture, uranusTexture, neptuneTexture]
     const [spaceObjectsData, setSpaceObjectsData] = useState<Planet[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -106,13 +106,14 @@ const SolarSystem: React.FC = () => {
         <>
             <Canvas camera={{position: [0, 0, 100], fov: 60, far: 35000}}>
                 <ambientLight intensity={0.1}/>
-                <pointLight position={[0, 0, 0]} intensity={300} decay={1} distance={15000} castShadow={true}/>
+                <pointLight position={[0, 0, 0]} intensity={500} decay={1} distance={15000} castShadow={true}/>
                 <Stars count={15000} radius={10000} depth={1000} factor={40}/>
-
+                //TODO: Maybe better realize ABSOLUTELY REAL data params but add some buttons to manage and control cam
+                position
                 <SpaceObject
                     pName={names[0]}
                     position={[0, 0, 0]}
-                    size={getSize(names[0])*0.000065}
+                    size={getSize(names[0]) * 0.00009}
                     emissive={true}
                     orbitRadius={0}
                     orbitSpeed={0}
@@ -125,9 +126,9 @@ const SolarSystem: React.FC = () => {
                             key={name}
                             pName={name}
                             position={[0, 0, 0]}
-                            size={getSize(name) * (name==="Sun"? 0.0000001: 0.0004)}
-                            orbitRadius={getOrbit(name) * 0.000001}
-                            orbitSpeed={1 / getSpeed(name)*0.001}
+                            size={getSize(name) * (name === "Sun" ? 0.0000002 : 0.0002)}
+                            orbitRadius={getOrbit(name) * 0.000002}
+                            orbitSpeed={1 / getSpeed(name) * 0.0005}
                             emissive={name === "Sun"}
                             onClick={handlePlanetClick}
                             textureUrl={textures[index]}
