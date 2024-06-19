@@ -40,8 +40,6 @@ const CatalogPage: React.FC = () => {
     const [selectedPlanet, setSelectedPlanet] = useState<string | null>(null);
 
     useEffect(() => {
-        // Можно использовать API для получения списка планет
-        // В данном случае используем статический список
         const fetchedPlanets = [
             'Mercury',
             'Venus',
@@ -99,7 +97,8 @@ const CatalogPage: React.FC = () => {
             </Container>
 
             {selectedPlanet && (
-                // @ts-ignore
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
                 <Box sx={sxBoxProps}>
                     <Container maxWidth="md">
                         <Section>
@@ -107,7 +106,8 @@ const CatalogPage: React.FC = () => {
                                 {selectedPlanet}
                             </Typography>
                             <Typography variant="body1" align="center" paragraph>
-                                Detailed information about {selectedPlanet}. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                Detailed information about {selectedPlanet}. Lorem ipsum dolor sit amet,
+                                consectetur adipiscing elit.
                             </Typography>
                             <Button variant="contained" color="secondary" onClick={handleCloseInfoBox}>
                                 Close

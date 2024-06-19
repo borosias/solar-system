@@ -15,15 +15,18 @@ const ModelOpenPage = () => {
     const handleFullScreenToggle = () => {
         console.log('Toggle full screen');
     };
-    return(<Container sx={{
-    mt: 4,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end"
-}}>
-    <ModelBox id="model-container" sx={{ width: '100%' }}>
-        <SolarSystem />
-    </ModelBox>
-    <FullScreenButton onFullScreenToggle={handleFullScreenToggle} />
-</Container>);}
+
+    return (
+        <Container sx={{
+            mt: 4,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end"
+        }}>
+            <ModelBox id="model-container" sx={{width: '100%'}}>
+                <SolarSystem/>
+            </ModelBox>
+            <FullScreenButton onFullScreenToggle={handleFullScreenToggle}/>
+        </Container>);
+}
 export default ModelOpenPage;

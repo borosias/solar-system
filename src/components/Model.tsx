@@ -1,9 +1,9 @@
-import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Stars } from '@react-three/drei';
-import React, { useEffect, useState } from 'react';
+import {Canvas, extend, useFrame, useThree} from '@react-three/fiber';
+import {OrbitControls, Stars} from '@react-three/drei';
+import React, {useEffect, useState} from 'react';
 import SpaceObject from './SpaceObject.tsx';
-import { ObjectProps, Planet } from "../types/TPlanet.ts";
-import { getPlanetData } from "../api/planetInfo.ts";
+import {ObjectProps, Planet} from "../types/TPlanet.ts";
+import {getPlanetData} from "../api/planetInfo.ts";
 import PlanetInfoBox from "./PlanetInfoDialog.tsx";
 
 import sunTexture from '../textures/sun.jpg';
@@ -16,37 +16,38 @@ import saturnTexture from '../textures/saturn.jpg';
 import uranusTexture from '../textures/uranus.jpg';
 import neptuneTexture from '../textures/neptune.jpg';
 
-extend({ OrbitControls });
+extend({OrbitControls});
 
-const CameraController: React.FC<{ selectedPlanet: ObjectProps | null }> = ({ selectedPlanet }) => {
-    const { camera, gl } = useThree();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const controls = React.useRef<any>();
+const CameraController: React.FC<{ selectedPlanet: ObjectProps | null }> =
+    ({selectedPlanet}) => {
+        const {camera, gl} = useThree();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const controls = React.useRef<any>();
 
-    useFrame(() => {
-        if (controls.current) {
-            controls.current.update();
-        }
-    });
+        useFrame(() => {
+            if (controls.current) {
+                controls.current.update();
+            }
+        });
 
-    useEffect(() => {
-        if (selectedPlanet) {
-            // Центрируем камеру вокруг выбранной планеты
-            controls.current.target.set(...selectedPlanet.position);
-        }
-    }, [selectedPlanet]);
+        useEffect(() => {
+            if (selectedPlanet) {
+                // Центрируем камеру вокруг выбранной планеты
+                controls.current.target.set(...selectedPlanet.position);
+            }
+        }, [selectedPlanet]);
 
-    return (
-        <OrbitControls
-            ref={controls}
-            args={[camera, gl.domElement]}
-            enableDamping
-            dampingFactor={0.1}
-            rotateSpeed={0.5}
-            minDistance={1}
-        />
-    );
-};
+        return (
+            <OrbitControls
+                ref={controls}
+                args={[camera, gl.domElement]}
+                enableDamping
+                dampingFactor={0.1}
+                rotateSpeed={0.5}
+                minDistance={1}
+            />
+        );
+    };
 
 //===============================================================================
 
@@ -68,10 +69,10 @@ const SolarSystem: React.FC = () => {
                     setLoading(false);
                 } catch (error) {
                     console.error('Error parsing data from localStorage:', error);
-                    localStorage.removeItem('spaceObjectsData'); // Удаляем кеш, если не удалось его прочитать
+                    localStorage.removeItem('spaceObjectsData');
                 }
             } else {
-                let retries = 3; // Количество попыток повторной загрузки
+                let retries = 3;
                 const fetchData = async () => {
                     try {
                         const dataPromises = names.map(name => getPlanetData(name));
@@ -84,10 +85,9 @@ const SolarSystem: React.FC = () => {
                         console.error('Error fetching data from API:', error);
                         retries--;
                         if (retries > 0) {
-                            setTimeout(fetchData, 1000 * (3 - retries)); // Экспоненциальная задержка повторных попыток
+                            setTimeout(fetchData, 1000 * (3 - retries));
                         } else {
-                            localStorage.removeItem('spaceObjectsData'); // Удаляем кеш, если не удалось загрузить данные
-                            // Возможно, отобразить сообщение об ошибке пользователю
+                            localStorage.removeItem('spaceObjectsData');
                         }
                     }
                 };
@@ -99,17 +99,20 @@ const SolarSystem: React.FC = () => {
     }, [names]);
 
     const getOrbit = (name: string) => {
-        const planetData = spaceObjectsData.find(object => object.englishName.toLowerCase() === name.toLowerCase());
+        const planetData = spaceObjectsData.find(
+            object => object.englishName.toLowerCase() === name.toLowerCase());
         return planetData?.semimajorAxis || 0;
     };
 
     const getSize = (name: string) => {
-        const planetData = spaceObjectsData.find(object => object.englishName.toLowerCase() === name.toLowerCase());
+        const planetData = spaceObjectsData.find(
+            object => object.englishName.toLowerCase() === name.toLowerCase());
         return planetData?.meanRadius || 0;
     };
 
     const getSpeed = (name: string) => {
-        const planetData = spaceObjectsData.find(object => object.englishName.toLowerCase() === name.toLowerCase());
+        const planetData = spaceObjectsData.find(
+            object => object.englishName.toLowerCase() === name.toLowerCase());
         return planetData?.sideralOrbit || 0;
     };
 
@@ -121,11 +124,16 @@ const SolarSystem: React.FC = () => {
         setSelectedPlanet(null);
     };
 
-    const planetInfo = selectedPlanet ? spaceObjectsData.find(object => object.englishName.toLowerCase() === selectedPlanet.pName.toLowerCase()) : null;
+    const planetInfo = selectedPlanet
+        ?
+        spaceObjectsData.find(
+            object => object.englishName.toLowerCase() === selectedPlanet.pName.toLowerCase())
+        :
+        null;
 
     if (loading) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
                 <div>Loading...</div>
             </div>
         );
@@ -133,10 +141,10 @@ const SolarSystem: React.FC = () => {
 
     return (
         <>
-            <Canvas camera={{ position: [0, 0, 300], fov: 60, far: 35000 }}>
-                <ambientLight intensity={0.1} />
-                <pointLight position={[0, 0, 0]} intensity={500} decay={1} distance={15000} castShadow={true} />
-                <Stars count={15000} radius={10000} depth={1000} factor={40} />
+            <Canvas camera={{position: [0, 0, 300], fov: 60, far: 35000}}>
+                <ambientLight intensity={0.1}/>
+                <pointLight position={[0, 0, 0]} intensity={500} decay={1} distance={15000} castShadow={true}/>
+                <Stars count={15000} radius={10000} depth={1000} factor={40}/>
                 <SpaceObject
                     pName={names[0]}
                     position={[0, 0, 0]}
@@ -162,11 +170,11 @@ const SolarSystem: React.FC = () => {
                         />
                     ))
                 }
-                <CameraController selectedPlanet={selectedPlanet} />
+                <CameraController selectedPlanet={selectedPlanet}/>
             </Canvas>
 
             {selectedPlanet && planetInfo && (
-                <PlanetInfoBox planetInfo={planetInfo} onClose={handleCloseInfoBox} />
+                <PlanetInfoBox planetInfo={planetInfo} onClose={handleCloseInfoBox}/>
             )}
         </>
     );

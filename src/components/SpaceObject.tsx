@@ -5,20 +5,21 @@ import {ObjectProps} from "../types/TPlanet.ts";
 
 interface ClickablePlanetProps extends ObjectProps {
     onClick?: (planetInfo: ObjectProps) => void;
-    textureUrl: string; // Путь к текстуре теперь передается как пропс
+    textureUrl: string;
 }
 
-const SpaceObject: React.FC<ClickablePlanetProps> = ({
-                                                         position,
-                                                         color,
-                                                         size,
-                                                         orbitRadius = 0,
-                                                         orbitSpeed = 0,
-                                                         emissive = false,
-                                                         pName,
-                                                         textureUrl, // Путь к текстуре теперь принимается как пропс
-                                                         onClick
-                                                     }) => {
+const SpaceObject: React.FC<ClickablePlanetProps> = (
+    {
+        position,
+        color,
+        size,
+        orbitRadius = 0,
+        orbitSpeed = 0,
+        emissive = false,
+        pName,
+        textureUrl,
+        onClick
+    }) => {
     const mesh = useRef<THREE.Mesh>(null!);
     const [orbitPosition, setOrbitPosition] = useState(position);
 
@@ -86,7 +87,7 @@ const SpaceObject: React.FC<ClickablePlanetProps> = ({
                             emissive={emissive ? 'white' : 'black'}
                             emissiveIntensity={emissive ? 0.01 : 0}
                         />
-                        <pointLight color="yellow" distance={0} intensity={1.5} decay={2} />
+                        <pointLight color="yellow" distance={0} intensity={1.5} decay={2}/>
                     </>
                     :
                     <meshPhysicalMaterial

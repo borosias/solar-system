@@ -1,4 +1,4 @@
-export interface TSection {
+export interface TPages {
     title:string;
     href:string;
 }

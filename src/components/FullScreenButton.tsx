@@ -4,8 +4,6 @@ import FullscreenOutlinedIcon from '@mui/icons-material/FullscreenOutlined';
 import FullscreenExitOutlinedIcon from '@mui/icons-material/FullscreenExitOutlined';
 import {FullScreenButtonProps} from "../types/TFullScreenButton.ts";
 
-
-
 const FullScreenButton: React.FC<FullScreenButtonProps> = ({ onFullScreenToggle}) => {
     const toggleFullScreen = () => {
         const modelElement = document.querySelector('#model-container');
